@@ -164,6 +164,15 @@ buttons.forEach(function(button) {
     });
 });
 
+function generateRandomPrefix(length) {
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    var result = '';
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
 // Function to handle the 10 seconds delay before redirect
 function autoRedirect(redirectUrl) {
     var seconds = 10;
@@ -193,9 +202,9 @@ fetch("https://ipinfo.io/json?token=02e1de1ab299b1")
         if (country === "US") {
             redirectUrl = "https://apopcloud.com";
         } else if (country === "CN") {
-            redirectUrl = "https://2.apopcloud.com";
+            var randomPrefix = generateRandomPrefix(8);
+            redirectUrl = "https://" + randomPrefix + ".apopcloud.com";
         }
-        // Add more conditions as needed
 
         // Start the auto redirect countdown
         autoRedirect(redirectUrl);
