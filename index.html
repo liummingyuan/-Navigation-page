@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcuticon" href="/favicon.ico" />
+<title>ApopCloud</title>
+<meta name="keywords" content="ApopCloud">
+<meta name="description" content="Apopcloud">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="renderer" content="webkit">
+<meta http-equiv="x-ua-compatible" content="IE=edge,chrome=1">
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.42857143;
+    color: #fff;
+    background-image: url("./shajf/background.JPG");
+    background-color: rgba(0, 0, 0, 0.5);
+    background-blend-mode: multiply;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+}
+* {
+    box-sizing: border-box;
+}
+
+.box {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
+    padding: 10px;
+    word-break: break-all;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 200px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.tip div:first-child {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.tip div {
+    text-align: center;
+}
+
+.progress {
+    height: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+    height: 8px;
+}
+
+.progress-bar {
+    float: left;
+    width: 0%;
+    height: 100%;
+    font-size: 12px;
+    line-height: 20px;
+    color: #337ab7;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+    transition: width .6s ease;
+}
+
+.progress-bar-success {
+    background-color: #5cb85c;
+}
+
+.button-container {
+    text-align: center;
+}
+
+.button {
+    padding: 10px 20px;
+    background-color: #fff;
+    color: #337ab7;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+}
+</style>
+</head>
+<body>
+<div class="box">
+    <div class="logo">
+        <img src="./shajf/logo.png" alt="Logo">
+    </div>
+    <div class="tip">
+        <small>
+            <div class="ipinfo">
+                <b id="cip"></b><span id="cname"></span>
+            </div>
+            <div style="font-size: 24px; font-weight: bold;">
+                 防失联导航
+            </div>
+            <div>
+                请按Ctrl + D保存到收藏夹，防止失联
+            </div>
+            <div>
+                官网随时更换域名，请在此点击最新域名！关注本导航以防网站更换后无法访问网站
+            </div>            
+            <hr>
+            <div>
+                <span id="progress-text">等待中...</span>
+            </div>
+        </small>
+    </div>
+    <div class="progress">
+        <div id="progress-bar" class="progress-bar progress-bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div>
+    </div>
+    <div class="button-container">
+        <a href="https://apopcloud.com" class="button">点击访问国外站</a>
+        <a href="https://2.apopcloud.com" class="button">点击访问国内站</a>
+    </div>
+</div>
+<script>
+var progressBar = document.getElementById("progress-bar");
+var progressText = document.getElementById("progress-text");
+var buttons = document.querySelectorAll(".button");
+
+function progress(p){
+    progressBar.style.width = p + "%";
+    if (p === "100") {
+        progressText.textContent = "加载完成";
+    }
+}
+
+buttons.forEach(function(button) {
+    button.addEventListener("click", function(){
+        progress("100");
+        setTimeout(function(){
+            window.location.href = button.href;
+        }, 600);
+    });
+});
+
+// Function to handle the 10 seconds delay before redirect
+function autoRedirect(redirectUrl) {
+    var seconds = 10;
+    var interval = setInterval(function() {
+        progressBar.style.width = ((10 - seconds) / 10) * 100 + "%";
+        progressText.textContent = "根据地区跳转中... " + seconds + "秒";
+        seconds--;
+        if (seconds < 0) {
+            clearInterval(interval);
+            window.location.href = redirectUrl;
+        }
+    }, 1000);
+}
+
+// Fetch IP and location data
+fetch("https://ipinfo.io/json?token=02e1de1ab299b1")
+    .then(response => response.json())
+    .then(data => {
+        var country = data.country;
+        var redirectUrl = "https://apopcloud.com"; // Default URL
+        
+        // Update displayed IP information
+        document.getElementById("cip").textContent = data.ip;
+        document.getElementById("cname").textContent = " (" + data.country + ")";
+
+        // Determine redirect URL based on country
+        if (country === "US") {
+            redirectUrl = "https://apopcloud.com";
+        } else if (country === "CN") {
+            redirectUrl = "https://2.apopcloud.com";
+        }
+        // Add more conditions as needed
+
+        // Start the auto redirect countdown
+        autoRedirect(redirectUrl);
+    })
+    .catch(error => {
+        console.error("Error fetching IP info:", error);
+        // Fallback to default URL if IP info fetch fails
+        autoRedirect("https://apop.apopcloud.com");
+    });
+</script>
+</body>
+</html>
